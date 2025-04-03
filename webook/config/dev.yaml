@@ -1,0 +1,9 @@
+web:
+  port: ":8080"
+db:
+  dsn: "root:root@tcp(localhost:3306)/webook"
+redis:
+  addr: "localhost:6379"
+kafka:
+  addrs:
+    - "localhost:9094"
