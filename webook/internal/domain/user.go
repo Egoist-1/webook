@@ -6,6 +6,7 @@ type User struct {
 	Email    string
 	Password string
 	Phone    string
+	Avatar   string
 	AboutMe  string
 	CTime    int64
 }

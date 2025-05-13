@@ -7,8 +7,8 @@ import (
 	"golang.org/x/sync/errgroup"
 	"net/http"
 	"start/webook/internal/domain"
-	"start/webook/internal/e"
 	"start/webook/internal/service"
+	"start/webook/pkg/e"
 	"start/webook/pkg/ginx/jwtx"
 	"strconv"
 )
@@ -120,10 +120,10 @@ func (h *ArticleHandle) list(ctx *gin.Context) {
 	list, err := h.svc.List(ctx, uc.Id, req.Limit, req.Offset)
 	switch err.(type) {
 	case e.Err:
-		e := err.(e.Err)
+		er := err.(e.Err)
 		ctx.JSON(http.StatusOK, Result{
-			Msg:  e.Code().String(),
-			Code: e.Code().ToInt(),
+			Msg:  er.Code().String(),
+			Code: er.Code().ToInt(),
 		})
 	case error:
 		ctx.JSON(http.StatusOK, ServerErr())
@@ -259,7 +259,7 @@ func (h *ArticleHandle) pubDetail(ctx *gin.Context) {
 
 func (h *ArticleHandle) like(ctx *gin.Context) {
 	param := ctx.Param("id")
-	aid, err := strconv.Atoi(param)
+	_, err := strconv.Atoi(param)
 	if err != nil {
 		ctx.JSON(http.StatusOK, Result{
 			Code: http.StatusBadRequest,
@@ -267,7 +267,7 @@ func (h *ArticleHandle) like(ctx *gin.Context) {
 		})
 		return
 	}
-	claims, err := h.claims(ctx)
+	_, err = h.claims(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusOK, Result{
 			Code: http.StatusUnauthorized,
@@ -275,7 +275,7 @@ func (h *ArticleHandle) like(ctx *gin.Context) {
 		})
 		return
 	}
-	err = h.intrSvc.Like(ctx, h.biz, int64(aid), claims.Id)
+	//err = h.intrSvc.Like(ctx, h.biz, int64(aid), claims.Id)
 	switch err.(type) {
 	case e.Err:
 		e := err.(e.Err)

@@ -4,8 +4,8 @@ import (
 	"context"
 	"golang.org/x/crypto/bcrypt"
 	"start/webook/internal/domain"
-	"start/webook/internal/e"
 	"start/webook/internal/repository"
+	"start/webook/pkg/e"
 )
 
 type UserService interface {
@@ -21,7 +21,7 @@ type userServiceImpl struct {
 }
 
 func (svc userServiceImpl) LoginByPhone(ctx context.Context, phone string) (int, error) {
-	return svc.repo.LoginByPhone(ctx,phone)
+	return svc.repo.LoginByPhone(ctx, phone)
 }
 
 func (svc userServiceImpl) Edit(ctx context.Context, u domain.User) error {

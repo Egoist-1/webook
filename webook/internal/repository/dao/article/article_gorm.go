@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	"start/webook/internal/e"
+	"start/webook/pkg/e"
 	"time"
 )
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"github.com/redis/go-redis/v9"
-	"start/webook/internal/e"
+	"start/webook/pkg/e"
 )
 
 type CodeCache interface {

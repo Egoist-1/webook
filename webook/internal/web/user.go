@@ -8,8 +8,8 @@ import (
 	"go.uber.org/zap"
 	"net/http"
 	"start/webook/internal/domain"
-	"start/webook/internal/e"
 	"start/webook/internal/service"
+	"start/webook/pkg/e"
 	"start/webook/pkg/ginx/jwtx"
 )
 

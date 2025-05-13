@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"net/http"
-	"start/webook/internal/e"
+	"start/webook/pkg/e"
 )
 
 type handle interface {
@@ -30,7 +30,7 @@ func DecideErr(ctx *gin.Context, msg string, data any, err error) bool {
 	switch err.(type) {
 	case e.Err:
 		ecode := err.(e.Err)
-		zap.L().Warn(ecode.Log())
+		zap.L().Warn(ecode.Error())
 		ctx.JSON(http.StatusOK, Result{
 			Msg:  ecode.Code().String(),
 			Code: ecode.Code().ToInt(),

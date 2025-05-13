@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"github.com/go-sql-driver/mysql"
 	"gorm.io/gorm"
-	"start/webook/internal/e"
+	"start/webook/pkg/e"
 	"time"
 )
 
@@ -66,6 +66,7 @@ type User struct {
 	Name     string
 	Email    sql.NullString `gorm:"unique"`
 	Phone    sql.NullString `gorm:"unique"`
+	Avatar   string
 	Password string
 	AboutMe  string
 	CTime    int64
