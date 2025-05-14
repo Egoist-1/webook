@@ -25,7 +25,7 @@ type UserHandle struct {
 	biz           string
 }
 
-func (h UserHandle) RegisterRouter(server *gin.Engine) {
+func (h *UserHandle) RegisterRouter(server *gin.Engine) {
 	g := server.Group("/user")
 	g.POST("/signup", h.signup)
 	g.POST("/login", h.login)
@@ -33,6 +33,10 @@ func (h UserHandle) RegisterRouter(server *gin.Engine) {
 	g.POST("/profile", h.profile)
 	g.POST("/send_sms", h.sendSms)
 	g.POST("/login_sms", h.loginSMS)
+	g.POST("/login_github", h.loginByGithub)
+	g.POST("login_wechat", h.loginByWechat)
+	g.POST("login_email", h.sendEmail)
+
 }
 
 func NewUserHandle(svc service2.UserService, codesvc service.CodeService) *UserHandle {
@@ -45,10 +49,10 @@ func NewUserHandle(svc service2.UserService, codesvc service.CodeService) *UserH
 		PhoneRegex:    regexp2.MustCompile(PhoneRegexPattern, 0),
 		svc:           svc,
 		codeSvc:       codesvc,
-		biz:           "login",
+		biz:           "user",
 	}
 }
-func (h UserHandle) profile(ctx *gin.Context) {
+func (h *UserHandle) profile(ctx *gin.Context) {
 	claims, er := ctx.Get("claims")
 	fmt.Println(er)
 	uc := claims.(*jwtx.UserClaims)
@@ -58,7 +62,7 @@ func (h UserHandle) profile(ctx *gin.Context) {
 	DecideErr(ctx, "简介", profile, err)
 }
 
-func (h UserHandle) signup(ctx *gin.Context) {
+func (h *UserHandle) signup(ctx *gin.Context) {
 
 	type Req struct {
 		Name            string `json:"name"`
@@ -119,7 +123,7 @@ func (h UserHandle) signup(ctx *gin.Context) {
 	}
 }
 
-func (h UserHandle) login(ctx *gin.Context) {
+func (h *UserHandle) login(ctx *gin.Context) {
 	type Req struct {
 		Email    string
 		Password string
@@ -144,7 +148,7 @@ func (h UserHandle) login(ctx *gin.Context) {
 	}
 }
 
-func (h UserHandle) edit(ctx *gin.Context) {
+func (h *UserHandle) edit(ctx *gin.Context) {
 	type Req struct {
 		Name    string
 		Phone   string
@@ -165,7 +169,7 @@ func (h UserHandle) edit(ctx *gin.Context) {
 	DecideErr(ctx, "编辑成功", nil, err)
 }
 
-func (h UserHandle) sendSms(ctx *gin.Context) {
+func (h *UserHandle) sendSms(ctx *gin.Context) {
 	type Req struct {
 		Phone string
 	}
@@ -190,7 +194,7 @@ func (h UserHandle) sendSms(ctx *gin.Context) {
 	DecideErr(ctx, "发送成功", nil, err)
 }
 
-func (h UserHandle) loginSMS(ctx *gin.Context) {
+func (h *UserHandle) loginSMS(ctx *gin.Context) {
 	type Req struct {
 		Phone string
 		Code  string
@@ -229,4 +233,25 @@ func (h UserHandle) loginSMS(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, ServerErr())
 		return
 	}
+}
+
+func (h *UserHandle) loginByGithub(ctx *gin.Context) {
+	//TODO
+}
+
+func (h *UserHandle) loginByWechat(ctx *gin.Context) {
+	//todo
+}
+
+func (h *UserHandle) sendEmail(ctx *gin.Context) {
+	type Req struct {
+		Email string
+	}
+	var req Req
+	err := ctx.Bind(&req)
+	if err != nil {
+
+	}
+	err = h.codeSvc.SendEmail(ctx, h.biz, req.Email)
+	DecideErr(ctx, "发送成功", nil, err)
 }

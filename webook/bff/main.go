@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	main2 "start/webook/bff"
 )
 
 func main() {
 	initViper()
 	initLogger()
-	app := main2.InitApp()
+	app := InitApp()
 	var s = viper.GetString("web.port")
 	fmt.Println(s)
 	app.web.Run(viper.GetString("web.port"))

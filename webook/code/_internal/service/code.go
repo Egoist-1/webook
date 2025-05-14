@@ -4,17 +4,31 @@ import (
 	"context"
 	"math/rand"
 	"start/webook/code/_internal/repository"
+	"start/webook/email/_intenal/service"
 	"start/webook/sms/_internal/service/sms"
 )
 
 type CodeService interface {
 	SendSMS(ctx context.Context, biz, phone string) error
 	Verify(ctx context.Context, biz string, phone string, code string) error
+	SendEmail(ctx context.Context, biz, email string) error
 }
 
 type codeService struct {
-	s    sms.SMS
-	repo repository.CodeRepo
+	s        sms.SMS
+	emailSvc service.EmailService
+	repo     repository.CodeRepo
+}
+
+func (c codeService) SendEmail(ctx context.Context, biz, email string) error {
+	params := make([]string, 1)
+	params[1] = string(rand.Intn(900000) + 100000)
+	err := c.emailSvc.Send(ctx, email, biz, params)
+	if err != nil {
+		return err
+	}
+	err = c.repo.Store(ctx, c.generateKey(email, biz), params[1])
+	return err
 }
 
 func (c codeService) Verify(ctx context.Context, biz string, phone string, code string) error {

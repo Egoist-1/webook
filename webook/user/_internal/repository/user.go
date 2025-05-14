@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"github.com/jinzhu/copier"
+	"start/webook/user/_internal/domain"
 	"start/webook/user/_internal/repository/dao"
-	"start/webook/user/internal/domain"
 )
 
 type UserRepo interface {

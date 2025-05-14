@@ -4,8 +4,8 @@ import (
 	"context"
 	"golang.org/x/crypto/bcrypt"
 	"start/webook/pkg/e"
+	"start/webook/user/_internal/domain"
 	"start/webook/user/_internal/repository"
-	"start/webook/user/internal/domain"
 )
 
 type UserService interface {
