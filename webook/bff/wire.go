@@ -15,6 +15,7 @@ import (
 	service2 "start/webook/user/_internal/service"
 )
 
+var email = wire.NewSet()
 var user = wire.NewSet(
 	web.NewUserHandle,
 	service2.NewUserServiceImpl,
@@ -35,6 +36,7 @@ func InitApp() *App {
 		user,
 		code,
 		sms,
+		email,
 		ioc2.InitWebServer,
 		ioc2.InitGorm,
 		wire.Struct(new(App), "*"),

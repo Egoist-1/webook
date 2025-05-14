@@ -34,9 +34,8 @@ func (h *UserHandle) RegisterRouter(server *gin.Engine) {
 	g.POST("/send_sms", h.sendSms)
 	g.POST("/login_sms", h.loginSMS)
 	g.POST("/login_github", h.loginByGithub)
-	g.POST("login_wechat", h.loginByWechat)
-	g.POST("login_email", h.sendEmail)
-
+	g.POST("/login_wechat", h.loginByWechat)
+	g.POST("/send_email", h.sendEmail)
 }
 
 func NewUserHandle(svc service2.UserService, codesvc service.CodeService) *UserHandle {

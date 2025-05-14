@@ -10,8 +10,6 @@ func main() {
 	initViper()
 	initLogger()
 	app := InitApp()
-	var s = viper.GetString("web.port")
-	fmt.Println(s)
 	app.web.Run(viper.GetString("web.port"))
 }
 
