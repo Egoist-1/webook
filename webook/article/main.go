@@ -1,1 +1,6 @@
 package article
+
+
+
+func do() {
+}
