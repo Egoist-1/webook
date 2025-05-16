@@ -261,7 +261,7 @@ func (h *ArticleHandle) pubDetail(ctx *gin.Context) {
 
 func (h *ArticleHandle) like(ctx *gin.Context) {
 	param := ctx.Param("id")
-	_, err := strconv.Atoi(param)
+	cid, err := strconv.Atoi(param)
 	if err != nil {
 		ctx.JSON(http.StatusOK, Result{
 			Code: http.StatusBadRequest,
@@ -269,7 +269,7 @@ func (h *ArticleHandle) like(ctx *gin.Context) {
 		})
 		return
 	}
-	_, err = h.claims(ctx)
+	claims, err := h.claims(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusOK, Result{
 			Code: http.StatusUnauthorized,
@@ -277,7 +277,7 @@ func (h *ArticleHandle) like(ctx *gin.Context) {
 		})
 		return
 	}
-	//err = h.intrSvc.Like(ctx, h.biz, int64(aid), claims.Id)
+	err = h.intrSvc.Liked(ctx, h.biz, int64(cid), int64(claims.Id))
 	switch err.(type) {
 	case e.Err:
 		e := err.(e.Err)

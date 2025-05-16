@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"start/webook/code/_internal/repository/cache"
+	"start/webook/user/_internal/repository/cache"
 )
 
 type CodeRepo interface {

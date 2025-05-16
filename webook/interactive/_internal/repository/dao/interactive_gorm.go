@@ -11,6 +11,8 @@ type InteractiveDao interface {
 	FindByBizId(ctx context.Context, biz string, aid int64, uid int) (Interactive, error)
 	LikedInfo(ctx context.Context, biz string, id int64, uid int) (UserIntrInfo, error)
 	IncrReadCnt(ctx context.Context, aid int) error
+	Liked(ctx context.Context, biz string, aid int64, uid int64) error
+	Collected(ctx context.Context, biz string, aid int64, uid int64, id int64) error
 }
 
 func NewIntrDao(db *gorm.DB) InteractiveDao {
@@ -21,6 +23,43 @@ func NewIntrDao(db *gorm.DB) InteractiveDao {
 
 type intrDao struct {
 	db *gorm.DB
+}
+
+func (dao *intrDao) Collected(ctx context.Context, biz string, aid int64, uid int64, id int64) error {
+	now := time.Now().UnixMilli()
+	dao.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		err := tx.Model(&Interactive{}).Where("biz_id = ?", aid).
+			Update("collected_cnt", gorm.Expr("collected_cnt + 1")).Error
+		if err != nil {
+			return err
+		}
+	})
+	return nil
+}
+
+func (dao *intrDao) Liked(ctx context.Context, biz string, aid int64, uid int64) error {
+	//在这里同时增加like的计数和创建用户关联
+	now := time.Now().UnixMilli()
+	err := dao.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		//增加点赞记录
+		err := tx.Model(&Interactive{}).Where("biz_id = ?", aid).
+			Update("like_cnt", gorm.Expr("like_cnt + 1")).Error
+		//增加用户点赞记录
+		err = tx.Clauses(clause.OnConflict{
+			DoUpdates: clause.Assignments(map[string]interface{}{
+				"liked": true,
+			}),
+		}).Create(&UserIntrInfo{
+			Uid:   uid,
+			Biz:   biz,
+			BizId: aid,
+			Liked: true,
+			Ctime: now,
+			Utime: now,
+		}).Error
+		return err
+	})
+	return err
 }
 
 func (dao *intrDao) IncrReadCnt(ctx context.Context, aid int) error {
@@ -61,8 +100,9 @@ func (dao *intrDao) LikedInfo(ctx context.Context, biz string, id int64, uid int
 }
 
 type Interactive struct {
-	Id         int
-	Biz        string
+	Id  int64
+	Biz string
+	//也就是 文章的id
 	BizId      int64
 	ReadCnt    int64
 	LikeCnt    int64
@@ -71,9 +111,10 @@ type Interactive struct {
 	Utime      int64
 }
 
+// TODO biz bizID uid 添加唯一索引
 type UserIntrInfo struct {
-	Id        int
-	Uid       int
+	Id        int64
+	Uid       int64
 	Biz       string
 	BizId     int64
 	Liked     bool
@@ -82,4 +123,18 @@ type UserIntrInfo struct {
 	Status int
 	Ctime  int64
 	Utime  int64
+}
+
+// TODO biz bizID uid 添加唯一索引
+type Collection struct {
+	Id    int64
+	Uid   int64
+	Biz   string
+	BizId int64
+	//文件夹id
+	CollectionId int64
+	//文件夹名称
+	CollectionName string
+	Ctime          int64
+	Utime          int64
 }

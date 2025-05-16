@@ -2,8 +2,8 @@ package repository
 
 import (
 	"context"
+	"start/webook/article/_internal/domain"
 	"start/webook/article/_internal/repository/dao"
-	"start/webook/article/internal/domain"
 	"start/webook/pkg/tools/slicex"
 )
 

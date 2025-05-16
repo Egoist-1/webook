@@ -11,7 +11,3 @@ type Article struct {
 }
 
 type ArticlePublish Article
-
-type Interactive struct {
-	Id int
-}

@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 	"go.uber.org/zap"
+	"start/webook/article/_internal/domain"
+	"start/webook/article/_internal/event/article"
 	"start/webook/article/_internal/repository"
-	"start/webook/article/internal/domain"
-	"start/webook/article/internal/event/article"
 )
 
 //go:generate mockgen -source=article.go -package=svcmocks -destination=mocks/article.mock.go ArticleService
@@ -43,6 +43,7 @@ func (svc *articleService) PubDetail(ctx context.Context, uid int, aid int) (dom
 	if err != nil {
 		return domain.Article{}, err
 	}
+
 	go func() {
 		er := svc.producer.IncrReadCnt(ctx, article.ReadEvent{
 			Uid: art.Id,

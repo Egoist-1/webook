@@ -7,7 +7,6 @@ import (
 	"github.com/jinzhu/copier"
 	"go.uber.org/zap"
 	"net/http"
-	"start/webook/code/_internal/service"
 	"start/webook/pkg/e"
 	"start/webook/pkg/ginx/jwtx"
 	"start/webook/user/_internal/domain"
@@ -21,7 +20,7 @@ type UserHandle struct {
 	PasswordRegex *regexp2.Regexp
 	PhoneRegex    *regexp2.Regexp
 	svc           service2.UserService
-	codeSvc       service.CodeService
+	codeSvc       service2.CodeService
 	biz           string
 }
 
@@ -38,7 +37,7 @@ func (h *UserHandle) RegisterRouter(server *gin.Engine) {
 	g.POST("/send_email", h.sendEmail)
 }
 
-func NewUserHandle(svc service2.UserService, codesvc service.CodeService) *UserHandle {
+func NewUserHandle(svc service2.UserService, codesvc service2.CodeService) *UserHandle {
 	var EmailRegexPattern = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 	var PasswordRegexPattern = `^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$`
 	var PhoneRegexPattern = `^1[3-9]\d{9}$`

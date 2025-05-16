@@ -6,11 +6,9 @@ import (
 	"github.com/google/wire"
 	ioc2 "start/webook/bff/ioc"
 	"start/webook/bff/web"
-	"start/webook/code/_internal/repository"
-	"start/webook/code/_internal/repository/cache"
-	"start/webook/code/_internal/service"
 	"start/webook/sms/_internal/service/sms/memory"
 	repository2 "start/webook/user/_internal/repository"
+	"start/webook/user/_internal/repository/cache"
 	"start/webook/user/_internal/repository/dao"
 	service2 "start/webook/user/_internal/service"
 )
@@ -23,8 +21,8 @@ var user = wire.NewSet(
 	dao.NewUserDao,
 )
 var code = wire.NewSet(
-	service.NewCodeService,
-	repository.NewCodeRepo,
+	service2.NewCodeService,
+	repository2.NewCodeRepo,
 	cache.NewCodeCacheRedis,
 )
 var sms = wire.NewSet(
