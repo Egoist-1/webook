@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/IBM/sarama"
 	"go.uber.org/zap"
-	"start/webook/interactive/_internal/repository"
-	"start/webook/pkg/saramax"
 	"time"
+	"webook/_internal/interactive/_internal/repository"
+	"webook/pkg/saramax"
 )
 
 func NewInteractiveConsumer(client sarama.Client, repo repository.InteractiveRepository) *InteractiveConsumer {

@@ -1,11 +1,11 @@
 package dao
 
 type Article struct {
-	Id       int
+	Id       int64
 	Title    string
 	Content  string
 	Status   uint
-	AuthorId int
+	AuthorId int64
 	Ctime    int64
 	Utime    int64
 }

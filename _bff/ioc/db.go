@@ -6,8 +6,8 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"start/webook/article/_internal/repository/dao"
 	"time"
+	"webook/_internal/article/_internal/repository/dao"
 )
 
 func InitGorm() *gorm.DB {

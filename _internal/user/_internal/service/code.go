@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 	"math/rand"
-	"start/webook/email/_intenal/service"
-	"start/webook/sms/_internal/service/sms"
-	"start/webook/user/_internal/repository"
+	"webook/_basicServer/email/_intenal/service"
+	"webook/_basicServer/sms/_internal/service/sms"
+	"webook/_internal/user/_internal/repository"
 )
 
 type CodeService interface {

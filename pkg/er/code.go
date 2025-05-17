@@ -1,4 +1,4 @@
-package e
+package er
 
 const (
 	Code_NotFind                     ErrCode = 2001 //验证码不存在,请重新发送
