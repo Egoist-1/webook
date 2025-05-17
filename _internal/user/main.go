@@ -1,6 +1,1 @@
 package article
-
-
-
-func do() {
-}

@@ -4,9 +4,9 @@ import (
 	"context"
 	rlock "github.com/gotomicro/redis-lock"
 	"go.uber.org/zap"
-	"start/webook/_internal/service"
 	"sync"
 	"time"
+	"webook/_internal/_internal/service"
 )
 
 func NewRankingJob() Job {

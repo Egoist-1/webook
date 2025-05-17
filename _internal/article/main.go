@@ -1,0 +1,4 @@
+package article
+
+func do() {
+}

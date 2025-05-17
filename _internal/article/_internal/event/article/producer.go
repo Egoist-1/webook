@@ -31,6 +31,6 @@ func (p *ProducerKafka) IncrReadCnt(ctx context.Context, event ReadEvent) error 
 }
 
 type ReadEvent struct {
-	Uid int
-	Aid int
+	Uid int64
+	Aid int64
 }

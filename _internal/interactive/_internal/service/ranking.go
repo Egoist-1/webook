@@ -4,17 +4,16 @@ import (
 	"context"
 	"github.com/ecodeclub/ekit/queue"
 	"math"
-	service2 "start/webook/article/_internal/service"
-	service3 "start/webook/interactive/_internal/service"
-	"start/webook/interactive/internal/domain"
 	"time"
+	service2 "webook/_internal/article/_internal/service"
+	"webook/_internal/interactive/_internal/domain"
 )
 
 type RankingService interface {
 	TobN(ctx context.Context) error
 }
 
-func NewRankingService(asvc service2.ArticleService, isvc service3.InteractiveService) RankingService {
+func NewRankingService(asvc service2.ArticleService, isvc InteractiveService) RankingService {
 	return &rankingService{
 		artSvc: asvc,
 		intr:   isvc,
@@ -29,7 +28,7 @@ func NewRankingService(asvc service2.ArticleService, isvc service3.InteractiveSe
 
 type rankingService struct {
 	artSvc service2.ArticleService
-	intr   service3.InteractiveService
+	intr   InteractiveService
 	//每次处理多少
 	capacity int
 	batch    int
