@@ -7,10 +7,10 @@ import (
 	"github.com/jinzhu/copier"
 	"go.uber.org/zap"
 	"net/http"
-	"start/webook/pkg/e"
-	"start/webook/pkg/ginx/jwtx"
-	"start/webook/user/_internal/domain"
-	service2 "start/webook/user/_internal/service"
+	"webook/_internal/user/_internal/domain"
+	service2 "webook/_internal/user/_internal/service"
+	"webook/pkg/er"
+	"webook/pkg/ginx/jwtx"
 )
 
 var _ handle = (*UserHandle)(nil)
@@ -78,7 +78,7 @@ func (h *UserHandle) signup(ctx *gin.Context) {
 	if req.Password != req.ConfirmPassword {
 		ctx.JSON(http.StatusOK, Result{
 			Msg:  "密码不一致",
-			Code: e.UserInvalidInput.ToInt(),
+			Code: er.UserInvalidInput.ToInt(),
 		})
 		return
 	}
@@ -89,18 +89,18 @@ func (h *UserHandle) signup(ctx *gin.Context) {
 	if !ok {
 		ctx.JSON(http.StatusOK, Result{
 			Msg:  "邮箱有误",
-			Code: e.UserInvalidInput.ToInt(),
+			Code: er.UserInvalidInput.ToInt(),
 		})
 		return
 	}
-	//ok, err = h.PasswordRegex.MatchString(req.Email)
-	//if err != nil {
+	//ok, er = h.PasswordRegex.MatchString(req.Email)
+	//if er != nil {
 	//	ctx.AbortWithStatusJSON(http.StatusOK, ServerErr())
 	//}
 	//if !ok {
 	//	ctx.JSON(http.StatusOK, Result{
 	//		Msg:  "密码必须包含数字、特殊字符，并且长度不能小于 8 位",
-	//		code: e.UserInvalidInput.code(),
+	//		code: er.UserInvalidInput.code(),
 	//	})
 	//	return
 	//}
@@ -132,8 +132,7 @@ func (h *UserHandle) login(ctx *gin.Context) {
 		ctx.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-	var uid int
-	uid, err = h.svc.LoginEmail(ctx, req.Email, req.Password)
+	uid, err := h.svc.LoginEmail(ctx, req.Email, req.Password)
 	ok := DecideErr(ctx, "登录成功", nil, err)
 	if !ok {
 		return
@@ -183,8 +182,8 @@ func (h *UserHandle) sendSms(ctx *gin.Context) {
 	}
 	if !ok {
 		ctx.JSON(http.StatusOK, Result{
-			Msg:  e.UserInvalidInput.String(),
-			Code: e.UserInvalidInput.ToInt(),
+			Msg:  er.UserInvalidInput.String(),
+			Code: er.UserInvalidInput.ToInt(),
 		})
 		return
 	}
@@ -210,8 +209,8 @@ func (h *UserHandle) loginSMS(ctx *gin.Context) {
 	if !ok {
 		zap.L().Warn("手机正则校验错误", zap.Error(err))
 		ctx.JSON(http.StatusOK, Result{
-			Msg:  e.UserInvalidInput.String(),
-			Code: e.UserInvalidInput.ToInt(),
+			Msg:  er.UserInvalidInput.String(),
+			Code: er.UserInvalidInput.ToInt(),
 		})
 		return
 	}

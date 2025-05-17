@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	_ "embed"
-	"start/webook/pkg/emailx"
+	"webook/pkg/emailx"
 )
 
 type EmailService interface {

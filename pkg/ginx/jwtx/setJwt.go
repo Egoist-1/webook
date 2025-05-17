@@ -5,7 +5,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func SetJwt(ctx *gin.Context, id int) error {
+func SetJwt(ctx *gin.Context, id int64) error {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, UserClaims{
 		Id:               id,
 		RegisteredClaims: jwt.RegisteredClaims{

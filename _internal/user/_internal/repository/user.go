@@ -4,23 +4,23 @@ import (
 	"context"
 	"database/sql"
 	"github.com/jinzhu/copier"
-	"start/webook/user/_internal/domain"
-	"start/webook/user/_internal/repository/dao"
+	"webook/_internal/user/_internal/domain"
+	"webook/_internal/user/_internal/repository/dao"
 )
 
 type UserRepo interface {
-	Create(ctx context.Context, user domain.User) (int, error)
-	Profile(ctx context.Context, uid int) (domain.User, error)
+	Create(ctx context.Context, user domain.User) (int64, error)
+	Profile(ctx context.Context, uid int64) (domain.User, error)
 	FindByEmail(ctx context.Context, email string) (domain.User, error)
 	Edit(ctx context.Context, u domain.User) error
-	LoginByPhone(ctx context.Context, phone string) (int, error)
+	LoginByPhone(ctx context.Context, phone string) (int64, error)
 }
 
 type userRepoImpl struct {
 	dao dao.UserDAO
 }
 
-func (repo userRepoImpl) LoginByPhone(ctx context.Context, phone string) (int, error) {
+func (repo userRepoImpl) LoginByPhone(ctx context.Context, phone string) (int64, error) {
 	var u dao.User
 	u.Phone = sql.NullString{
 		String: phone,
@@ -40,7 +40,7 @@ func (repo userRepoImpl) FindByEmail(ctx context.Context, email string) (u domai
 
 }
 
-func (repo userRepoImpl) Profile(ctx context.Context, uid int) (domain.User, error) {
+func (repo userRepoImpl) Profile(ctx context.Context, uid int64) (domain.User, error) {
 	user, err := repo.dao.FindById(ctx, uid)
 	if err != nil {
 		return domain.User{}, err
@@ -56,7 +56,7 @@ func NewUserRepo(dao dao.UserDAO) UserRepo {
 	}
 }
 
-func (repo userRepoImpl) Create(ctx context.Context, user domain.User) (int, error) {
+func (repo userRepoImpl) Create(ctx context.Context, user domain.User) (int64, error) {
 	return repo.dao.Insert(ctx, repo.domainToEntity(user))
 }
 func (repo userRepoImpl) domainToEntity(u domain.User) dao.User {

@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"net/http"
-	"start/webook/pkg/e"
+	"webook/pkg/er"
 )
 
 type handle interface {
@@ -19,17 +19,17 @@ type Result struct {
 
 func ServerErr() Result {
 	return Result{
-		Msg:  e.ServerErr.String(),
-		Code: e.ServerErr.ToInt(),
+		Msg:  er.ServerErr.String(),
+		Code: er.ServerErr.ToInt(),
 	}
 }
 
-// DecideErr msg:成功时返回的信息, data:返回前端的数据, err: error
+// DecideErr msg:成功时返回的信息, data:返回前端的数据, er: error
 func DecideErr(ctx *gin.Context, msg string, data any, err error) bool {
 	ok := false
 	switch err.(type) {
-	case e.Err:
-		ecode := err.(e.Err)
+	case er.Err:
+		ecode := err.(er.Err)
 		zap.L().Warn(ecode.Error())
 		ctx.JSON(http.StatusOK, Result{
 			Msg:  ecode.Code().String(),
