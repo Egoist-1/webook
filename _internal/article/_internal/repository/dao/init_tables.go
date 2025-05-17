@@ -2,7 +2,7 @@ package dao
 
 import (
 	"gorm.io/gorm"
-	dao2 "start/webook/user/_internal/repository/dao"
+	dao2 "webook/_internal/user/_internal/repository/dao"
 )
 
 func InitTables(db *gorm.DB) error {

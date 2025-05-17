@@ -2,7 +2,7 @@ package failover
 
 import (
 	"context"
-	"start/webook/sms/_internal/service/sms"
+	"webook/_basicServer/sms/_internal/service/sms"
 )
 
 type failover struct {

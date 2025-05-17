@@ -3,8 +3,8 @@ package ioc
 import (
 	"github.com/IBM/sarama"
 	"github.com/spf13/viper"
-	"start/webook/article/internal/event"
-	"start/webook/article/internal/event/article"
+	"webook/_internal/article/internal/event"
+	"webook/_internal/article/internal/event/article"
 )
 
 func InitKafka() sarama.Client {

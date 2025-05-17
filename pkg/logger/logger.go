@@ -6,4 +6,3 @@ type Logger interface {
 	Warn(msg string, field ...Field)
 	Error(msg string, field ...Field)
 }
-

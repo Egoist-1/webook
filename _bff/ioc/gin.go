@@ -2,9 +2,9 @@ package ioc
 
 import (
 	"github.com/gin-gonic/gin"
-	"start/webook/bff/web"
-	"start/webook/pkg/ginx/cors"
-	"start/webook/pkg/ginx/jwtx"
+	"webook/_bff/web"
+	"webook/pkg/ginx/cors"
+	"webook/pkg/ginx/jwtx"
 )
 
 func InitWebServer(userhandle *web.UserHandle) *gin.Engine {

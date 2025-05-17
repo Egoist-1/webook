@@ -11,3 +11,14 @@ type Interactive struct {
 	Ctime      int64
 	Utime      int64
 }
+
+type Collection struct {
+	Biz   string
+	BizId int64
+	//文件夹id
+	CollectionId int64
+	//文件夹名称
+	CollectionName string
+	Ctime          int64
+	Utime          int64
+}

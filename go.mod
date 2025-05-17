@@ -1,4 +1,4 @@
-module start
+module webook
 
 go 1.23.0
 
