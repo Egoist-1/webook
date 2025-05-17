@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"fmt"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -17,6 +18,38 @@ func NewArticleGormDao(db *gorm.DB) ArticleDao {
 
 type articleGormDao struct {
 	db *gorm.DB
+}
+
+func (dao *articleGormDao) SyncStatus(ctx context.Context, aid int64) error {
+	var (
+		//制作库的Id
+		id  int64
+		art Article
+	)
+	art.Id = aid
+	err := dao.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var err error
+		txdao := NewArticleGormDao(tx)
+		if art.Id > 0 {
+			id, err = txdao.UpdateById(ctx, art)
+		} else {
+			id, err = txdao.Create(ctx, art)
+		}
+		if err != nil {
+			return err
+		}
+		publish := ArticlePublish(art)
+		now := time.Now().UnixMilli()
+		err = tx.Clauses(clause.OnConflict{
+			DoUpdates: clause.Assignments(map[string]interface{}{
+				"status": publish.Status,
+				"utime":  now,
+			}),
+		}).Create(&publish).Error
+		return err
+	})
+	fmt.Print(id)
+	return err
 }
 
 func (dao *articleGormDao) PubList(ctx context.Context, uid int64, limit int, offset int) ([]ArticlePublish, error) {

@@ -12,4 +12,5 @@ type ArticleDao interface {
 	FindById(ctx context.Context, uid int64, aid int64) (Article, error)
 	PubFinById(ctx context.Context, uid int64, aid int64, status uint) (Article, error)
 	PubList(ctx context.Context, uid int64, limit int, offset int) ([]ArticlePublish, error)
+	SyncStatus(ctx context.Context, aid int64) error
 }

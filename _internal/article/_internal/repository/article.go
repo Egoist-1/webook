@@ -15,6 +15,7 @@ type ArticleRepository interface {
 	Detail(ctx context.Context, uid int64, aid int64) (domain.Article, error)
 	PubDetail(ctx context.Context, uid int64, aid int64, status domain.ArticleStatus) (domain.Article, error)
 	PubList(ctx context.Context, uid int64, limit int, offset int) ([]domain.Article, error)
+	SyncStatus(ctx context.Context, aid int64) error
 }
 
 func NewArticleRepository(dao dao.ArticleDao) ArticleRepository {
@@ -23,6 +24,10 @@ func NewArticleRepository(dao dao.ArticleDao) ArticleRepository {
 
 type articleRepository struct {
 	dao dao.ArticleDao
+}
+
+func (repo *articleRepository) SyncStatus(ctx context.Context, aid int64) error {
+	return repo.dao.SyncStatus(ctx, aid)
 }
 
 func (repo *articleRepository) PubList(ctx context.Context, uid int64, limit int, offset int) ([]domain.Article, error) {

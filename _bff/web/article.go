@@ -314,5 +314,12 @@ func (h *ArticleHandle) collectd(ctx *gin.Context) {
 }
 
 func (h *ArticleHandle) unpublish(ctx *gin.Context) {
-
+	param := ctx.Param("id")
+	aid, err := strconv.Atoi(param)
+	if err != nil {
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		zap.L().Warn("articleHandle edit 参数绑定失败", zap.Error(err), zap.Any("req", ctx.Request.Body))
+	}
+	err = h.svc.Unpublish(ctx, aid)
+	DecideErr(ctx, "", nil, err)
 }

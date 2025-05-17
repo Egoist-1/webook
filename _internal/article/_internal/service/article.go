@@ -17,6 +17,7 @@ type ArticleService interface {
 	PubDetail(ctx context.Context, id int64, aid int64) (domain.Article, error)
 	TopN(ctx context.Context, ids []int64) ([]domain.Article, error)
 	PubList(ctx context.Context, uid int64, limit int, offset int) ([]domain.Article, error)
+	Unpublish(ctx context.Context, aid int64) error
 }
 
 func NewArticleService(repo repository.ArticleRepository, producer article.Producer) ArticleService {
@@ -29,6 +30,10 @@ func NewArticleService(repo repository.ArticleRepository, producer article.Produ
 type articleService struct {
 	repo     repository.ArticleRepository
 	producer article.Producer
+}
+
+func (svc *articleService) Unpublish(ctx context.Context, aid int64) error {
+	return svc.repo.SyncStatus(ctx, aid)
 }
 
 func (svc *articleService) PubList(ctx context.Context, uid int64, limit int, offset int) ([]domain.Article, error) {
