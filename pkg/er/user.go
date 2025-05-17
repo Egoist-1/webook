@@ -1,4 +1,4 @@
-package e
+package er
 
 const (
 	UserExist                ErrCode = 1001 //用户已存在

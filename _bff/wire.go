@@ -4,13 +4,13 @@ package main
 
 import (
 	"github.com/google/wire"
-	ioc2 "start/webook/bff/ioc"
-	"start/webook/bff/web"
-	"start/webook/sms/_internal/service/sms/memory"
-	repository2 "start/webook/user/_internal/repository"
-	"start/webook/user/_internal/repository/cache"
-	"start/webook/user/_internal/repository/dao"
-	service2 "start/webook/user/_internal/service"
+	"webook/_basicServer/sms/_internal/service/sms/memory"
+	ioc2 "webook/_bff/ioc"
+	"webook/_bff/web"
+	repository2 "webook/_internal/user/_internal/repository"
+	"webook/_internal/user/_internal/repository/cache"
+	"webook/_internal/user/_internal/repository/dao"
+	service2 "webook/_internal/user/_internal/service"
 )
 
 var email = wire.NewSet()
