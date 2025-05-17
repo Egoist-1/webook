@@ -1,7 +1,7 @@
 package domain
 
 type Article struct {
-	Id      int
+	Id      int64
 	Title   string
 	Content string
 	Status  ArticleStatus
@@ -10,7 +10,7 @@ type Article struct {
 	Utime   int64
 }
 type Author struct {
-	Id   int
+	Id   int64
 	Name string
 }
 

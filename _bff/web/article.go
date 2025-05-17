@@ -6,13 +6,13 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 	"net/http"
-	domain2 "start/webook/article/_internal/domain"
-	service2 "start/webook/article/_internal/service"
-	"start/webook/interactive/_internal/domain"
-	"start/webook/interactive/_internal/service"
-	"start/webook/pkg/e"
-	"start/webook/pkg/ginx/jwtx"
 	"strconv"
+	domain2 "webook/_internal/article/_internal/domain"
+	service2 "webook/_internal/article/_internal/service"
+	"webook/_internal/interactive/_internal/domain"
+	"webook/_internal/interactive/_internal/service"
+	"webook/pkg/er"
+	"webook/pkg/ginx/jwtx"
 )
 
 type ArticleHandle struct {
@@ -29,7 +29,7 @@ func NewArticleHandle(svc service2.ArticleService, intrSvc service.InteractiveSe
 	}
 }
 
-func (h ArticleHandle) RegisterRouter(server *gin.Engine) {
+func (h *ArticleHandle) RegisterRouter(server *gin.Engine) {
 	g := server.Group("/article")
 	g.POST("/edit", h.edit)
 	g.POST("/withdraw")
@@ -37,16 +37,17 @@ func (h ArticleHandle) RegisterRouter(server *gin.Engine) {
 	g.POST("list", h.list)
 	g.POST("/detail/id", h.detail)
 	pub := g.Group("/pub")
+	pub.POST("/unpublish/:id", h.unpublish)
 	pub.POST("/detail/:id", h.pubDetail)
 	pub.POST("/list", h.pubList)
-	pub.POST("/like/:id", h.like)
-	//点赞接口
+	pub.POST("/like", h.like)
+	pub.POST("/collected", h.collectd)
 
 }
 
 func (h *ArticleHandle) edit(ctx *gin.Context) {
 	type Req struct {
-		Id      int
+		Id      int64
 		Title   string
 		Content string
 	}
@@ -76,7 +77,7 @@ func (h *ArticleHandle) edit(ctx *gin.Context) {
 
 func (h *ArticleHandle) publish(ctx *gin.Context) {
 	type Req struct {
-		Id      int
+		Id      int64
 		Title   string
 		Content string
 	}
@@ -121,8 +122,8 @@ func (h *ArticleHandle) list(ctx *gin.Context) {
 	ctx.Writer.Size()
 	list, err := h.svc.List(ctx, uc.Id, req.Limit, req.Offset)
 	switch err.(type) {
-	case e.Err:
-		er := err.(e.Err)
+	case er.Err:
+		er := err.(er.Err)
 		ctx.JSON(http.StatusOK, Result{
 			Msg:  er.Code().String(),
 			Code: er.Code().ToInt(),
@@ -146,10 +147,10 @@ func (h *ArticleHandle) detail(ctx *gin.Context) {
 	if err != nil {
 		return
 	}
-	art, err := h.svc.Detail(ctx, claims.Id, aid)
+	art, err := h.svc.Detail(ctx, claims.Id, int64(aid))
 	switch err.(type) {
-	case e.Err:
-		e := err.(e.Err)
+	case er.Err:
+		e := err.(er.Err)
 		ctx.JSON(http.StatusOK, Result{
 			Msg:  e.Code().String(),
 			Code: e.Code().ToInt(),
@@ -186,10 +187,10 @@ func (h *ArticleHandle) pubList(ctx *gin.Context) {
 		return
 	}
 	uc := claims.(*jwtx.UserClaims)
-	list, err := h.svc.List(ctx, uc.Id, req.Limit, req.Offset)
+	list, err := h.svc.PubList(ctx, uc.Id, req.Limit, req.Offset)
 	switch err.(type) {
-	case e.Err:
-		e := err.(e.Err)
+	case er.Err:
+		e := err.(er.Err)
 		ctx.JSON(http.StatusOK, Result{
 			Msg:  e.Code().String(),
 			Code: e.Code().ToInt(),
@@ -220,7 +221,7 @@ func (h *ArticleHandle) pubDetail(ctx *gin.Context) {
 	)
 	//文章详情
 	eg.Go(func() error {
-		art, err = h.svc.PubDetail(ctx, claims.Id, aid)
+		art, err = h.svc.PubDetail(ctx, claims.Id, int64(aid))
 		return err
 	})
 	//文章交互
@@ -230,8 +231,8 @@ func (h *ArticleHandle) pubDetail(ctx *gin.Context) {
 	})
 	err = eg.Wait()
 	switch err.(type) {
-	case e.Err:
-		e := err.(e.Err)
+	case er.Err:
+		e := err.(er.Err)
 		ctx.JSON(http.StatusOK, Result{
 			Msg:  e.Code().String(),
 			Code: e.Code().ToInt(),
@@ -260,8 +261,12 @@ func (h *ArticleHandle) pubDetail(ctx *gin.Context) {
 }
 
 func (h *ArticleHandle) like(ctx *gin.Context) {
-	param := ctx.Param("id")
-	cid, err := strconv.Atoi(param)
+	type Req struct {
+		Aid   int  `json:"aid"`
+		Liked bool `json:"liked"`
+	}
+	var req Req
+	err := ctx.Bind(&req)
 	if err != nil {
 		ctx.JSON(http.StatusOK, Result{
 			Code: http.StatusBadRequest,
@@ -277,20 +282,37 @@ func (h *ArticleHandle) like(ctx *gin.Context) {
 		})
 		return
 	}
-	err = h.intrSvc.Liked(ctx, h.biz, int64(cid), int64(claims.Id))
-	switch err.(type) {
-	case e.Err:
-		e := err.(e.Err)
-		ctx.JSON(http.StatusOK, Result{
-			Msg:  e.Code().String(),
-			Code: e.Code().ToInt(),
-		})
-	case error:
-		ctx.JSON(http.StatusOK, ServerErr())
-	default:
-		ctx.JSON(http.StatusOK, Result{
-			Code: http.StatusOK,
-			Msg:  "like success",
-		})
+	err = h.intrSvc.Liked(ctx, h.biz, int64(req.Aid), int64(claims.Id), req.Liked)
+	DecideErr(ctx, "点赞成功", nil, err)
+}
+
+func (h *ArticleHandle) collectd(ctx *gin.Context) {
+	type Req struct {
+		Aid       int64 `json:"aid"`
+		Cid       int64 `json:"cid"`
+		Collected bool  `json:"collected"`
 	}
+	var req Req
+	err := ctx.Bind(&req)
+	if err != nil {
+		ctx.JSON(http.StatusOK, Result{
+			Code: http.StatusBadRequest,
+			Msg:  "invalid article id",
+		})
+		return
+	}
+	claims, err := h.claims(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusOK, Result{
+			Code: http.StatusUnauthorized,
+			Msg:  "unauthorized",
+		})
+		return
+	}
+	err = h.intrSvc.Collected(ctx, h.biz, req.Aid, claims.Id, req.Cid, req.Collected)
+	DecideErr(ctx, "收藏成功", nil, err)
+}
+
+func (h *ArticleHandle) unpublish(ctx *gin.Context) {
+
 }

@@ -5,8 +5,8 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	"start/webook/pkg/e"
 	"time"
+	"webook/pkg/er"
 )
 
 func NewArticleGormDao(db *gorm.DB) ArticleDao {
@@ -19,7 +19,20 @@ type articleGormDao struct {
 	db *gorm.DB
 }
 
-func (dao *articleGormDao) PubFinById(ctx context.Context, uid int, aid int, status uint) (Article, error) {
+func (dao *articleGormDao) PubList(ctx context.Context, uid int64, limit int, offset int) ([]ArticlePublish, error) {
+	var arts []ArticlePublish
+	err := dao.db.WithContext(ctx).
+		Model(&Article{}).
+		Select("id,time,status,author_id,ctime,utime").
+		Where("Author_id = ?", uid).
+		Limit(limit).
+		Offset(offset).
+		Order("Ctime Desc").
+		Find(&arts).Error
+	return arts, err
+}
+
+func (dao *articleGormDao) PubFinById(ctx context.Context, uid int64, aid int64, status uint) (Article, error) {
 	var art = Article{}
 	err := dao.db.WithContext(ctx).Model(&Article{}).
 		Where("id = ? AND author_id = ?, status = ?", uid, aid, status).
@@ -27,7 +40,7 @@ func (dao *articleGormDao) PubFinById(ctx context.Context, uid int, aid int, sta
 	return art, err
 }
 
-func (dao *articleGormDao) FindById(ctx context.Context, uid int, aid int) (Article, error) {
+func (dao *articleGormDao) FindById(ctx context.Context, uid int64, aid int64) (Article, error) {
 	var art Article
 	err := dao.db.WithContext(ctx).Model(&Article{}).
 		Where("id = ? AND author_id = ?", aid, uid).
@@ -36,7 +49,7 @@ func (dao *articleGormDao) FindById(ctx context.Context, uid int, aid int) (Arti
 	return art, err
 }
 
-func (dao *articleGormDao) GetUnpublishList(ctx context.Context, uid int, limit int, offset int) (arts []Article, err error) {
+func (dao *articleGormDao) GetUnpublishList(ctx context.Context, uid int64, limit int, offset int) (arts []Article, err error) {
 	err = dao.db.WithContext(ctx).
 		Model(&Article{}).
 		Select("id,time,status,author_id,ctime,utime").
@@ -48,10 +61,10 @@ func (dao *articleGormDao) GetUnpublishList(ctx context.Context, uid int, limit 
 	return arts, err
 }
 
-func (dao *articleGormDao) Sync(ctx context.Context, art Article) (int, error) {
+func (dao *articleGormDao) Sync(ctx context.Context, art Article) (int64, error) {
 	var (
 		//制作库的Id
-		id int
+		id int64
 	)
 	err := dao.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		var err error
@@ -79,7 +92,7 @@ func (dao *articleGormDao) Sync(ctx context.Context, art Article) (int, error) {
 	return id, err
 }
 
-func (dao *articleGormDao) UpdateById(ctx context.Context, art Article) (int, error) {
+func (dao *articleGormDao) UpdateById(ctx context.Context, art Article) (int64, error) {
 	art.Utime = time.Now().UnixMilli()
 	result := dao.db.WithContext(ctx).
 		Where("id=? AND author_id = ? ", art.Id, art.AuthorId).
@@ -89,12 +102,12 @@ func (dao *articleGormDao) UpdateById(ctx context.Context, art Article) (int, er
 	}
 	if result.RowsAffected == 0 {
 		zap.L().Warn("articleGormDao 请求参数错误", zap.Any("请求", art))
-		return 0, e.NewServerErr("articleGormDao 请求参数错误", "")
+		return 0, er.NewServerErr("articleGormDao 请求参数错误", "")
 	}
 	return art.Id, result.Error
 }
 
-func (dao *articleGormDao) Create(ctx context.Context, art Article) (int, error) {
+func (dao *articleGormDao) Create(ctx context.Context, art Article) (int64, error) {
 	now := time.Now().UnixMilli()
 	art.Utime = now
 	art.Ctime = now

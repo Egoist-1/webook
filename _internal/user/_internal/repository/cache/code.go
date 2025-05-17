@@ -4,7 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"github.com/redis/go-redis/v9"
-	"start/webook/pkg/e"
+	"webook/pkg/er"
 )
 
 type CodeCache interface {
@@ -32,9 +32,9 @@ func (c codeCacheRedis) Store(ctx context.Context, key, val string) error {
 	case 0:
 		return nil
 	case -1:
-		return e.NewErr(e.ServerErr, "codeCacheRedis 没有设置过期时间", "")
+		return er.NewErr(er.ServerErr, "codeCacheRedis 没有设置过期时间", "")
 	case -2:
-		return e.NewErr(e.UserOperationTooFrequent, "codeCacheRedis 验证码重复发送", "")
+		return er.NewErr(er.UserOperationTooFrequent, "codeCacheRedis 验证码重复发送", "")
 	}
 	return err
 }
@@ -52,13 +52,13 @@ func (c codeCacheRedis) Verify(ctx context.Context, key, val string) error {
 		return nil
 	case -1:
 		//验证次数过多
-		return e.NewErr(e.Code_TooManyVerificationAttempts, "验证次数过多", "")
+		return er.NewErr(er.Code_TooManyVerificationAttempts, "验证次数过多", "")
 	case -2:
 		//验证码错误
-		return e.NewErr(e.Code_VerifyFail, "验证码错误", "")
+		return er.NewErr(er.Code_VerifyFail, "验证码错误", "")
 	case -3:
 		//KEY不存在
-		return e.NewErr(e.Code_NotFind, "Key不存在", "")
+		return er.NewErr(er.Code_NotFind, "Key不存在", "")
 	}
 	return err
 }
