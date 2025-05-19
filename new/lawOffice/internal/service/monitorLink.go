@@ -1,8 +1,11 @@
 package service
 
-type MonitorLink struct {
+type MonitorLink interface {
+	Analysis(str string) error
+}
+type monitorLink struct {
 }
 
-func (svc *MonitorLink) Analysis(str string) interface{} {
+func (svc *monitorLink) Analysis(str string) error {
 
 }
