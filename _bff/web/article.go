@@ -42,7 +42,6 @@ func (h *ArticleHandle) RegisterRouter(server *gin.Engine) {
 	pub.POST("/list", h.pubList)
 	pub.POST("/like", h.like)
 	pub.POST("/collected", h.collectd)
-
 }
 
 func (h *ArticleHandle) edit(ctx *gin.Context) {
@@ -320,6 +319,6 @@ func (h *ArticleHandle) unpublish(ctx *gin.Context) {
 		ctx.AbortWithStatus(http.StatusBadRequest)
 		zap.L().Warn("articleHandle edit 参数绑定失败", zap.Error(err), zap.Any("req", ctx.Request.Body))
 	}
-	err = h.svc.Unpublish(ctx, aid)
+	err = h.svc.Unpublish(ctx, int64(aid))
 	DecideErr(ctx, "", nil, err)
 }

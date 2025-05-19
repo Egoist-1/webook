@@ -30,11 +30,7 @@ func (dao *articleGormDao) SyncStatus(ctx context.Context, aid int64) error {
 	err := dao.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		var err error
 		txdao := NewArticleGormDao(tx)
-		if art.Id > 0 {
-			id, err = txdao.UpdateById(ctx, art)
-		} else {
-			id, err = txdao.Create(ctx, art)
-		}
+		id, err = txdao.UpdateById(ctx, art)
 		if err != nil {
 			return err
 		}
