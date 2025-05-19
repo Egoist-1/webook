@@ -19,6 +19,7 @@ type InteractiveService interface {
 	CancelCollection(ctx context.Context, biz string, uid int64, aid, cid int64) error
 	GetCollectionList(ctx context.Context, uid int64, biz string) ([]domain.Collection, error)
 	CollectionDetail(ctx context.Context, biz string, cid int64) (bizIds []int64, err error)
+	CancelLike(ctx context.Context, biz string, uid int64, aid int64) error
 }
 
 func NewInterService(repo repository.InteractiveRepository) InteractiveService {
@@ -27,6 +28,10 @@ func NewInterService(repo repository.InteractiveRepository) InteractiveService {
 
 type IntrService struct {
 	repo repository.InteractiveRepository
+}
+
+func (i *IntrService) CancelLike(ctx context.Context, biz string, uid int64, aid int64) error {
+	return i.repo.CancelLike(ctx, biz, uid, aid)
 }
 
 func (i *IntrService) CollectionDetail(ctx context.Context, biz string, cid int64) (bizIds []int64, err error) {

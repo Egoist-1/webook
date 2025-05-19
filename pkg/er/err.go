@@ -36,9 +36,7 @@ func (e ErrCode) ToInt() int {
 }
 
 //go:generate stringer -type ErrCode -linecomment
-const (
-	Success ErrCode = 20000 //
-)
+
 const (
 	ServerErr ErrCode = 50001 //系统错误
 )

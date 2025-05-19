@@ -24,8 +24,8 @@ func ServerErr() Result {
 	}
 }
 
-// DecideErr msg:成功时返回的信息, data:返回前端的数据, er: error
-func DecideErr(ctx *gin.Context, msg string, data any, err error) bool {
+// HandleErr msg:成功时返回的信息, data:返回前端的数据, er: error
+func HandleErr(ctx *gin.Context, msg string, data any, err error) bool {
 	ok := false
 	switch err.(type) {
 	case er.Err:

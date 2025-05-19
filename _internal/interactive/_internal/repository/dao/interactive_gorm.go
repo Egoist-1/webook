@@ -19,6 +19,7 @@ type InteractiveDao interface {
 	CancelCollection(ctx context.Context, biz string, uid int64, aid int64, cid int64) error
 	GetCollectionList(ctx context.Context, uid int64, biz string) ([]Collection, error)
 	CollectionDetail(ctx context.Context, biz string, cid int64) ([]int64, error)
+	CancelLike(ctx context.Context, biz string, uid int64, aid int64) error
 }
 
 func NewIntrDao(db *gorm.DB) InteractiveDao {
@@ -29,6 +30,13 @@ func NewIntrDao(db *gorm.DB) InteractiveDao {
 
 type intrDao struct {
 	db *gorm.DB
+}
+
+func (dao *intrDao) CancelLike(ctx context.Context, biz string, uid int64, aid int64) error {
+	return dao.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+
+		return nil
+	})
 }
 
 func (dao *intrDao) CollectionDetail(ctx context.Context, biz string, cid int64) ([]int64, error) {
@@ -50,6 +58,9 @@ func (dao *intrDao) GetCollectionList(ctx context.Context, uid int64, biz string
 
 func (dao *intrDao) CancelCollection(ctx context.Context, biz string, uid int64, aid int64, cid int64) error {
 	return dao.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		tx.Model(&Interactive{}).
+			Where("biz = ? and uid = ? and cid = ?", biz, uid, cid).
+			Update()
 		err := tx.Model(&UserIntrInfo{}).
 			Where("biz = ? and uid = ? aid = ?", biz, uid, aid).
 			Update("collected = ?", false).

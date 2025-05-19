@@ -20,6 +20,7 @@ type InteractiveRepository interface {
 	CancelCollection(ctx context.Context, biz string, uid int64, aid int64, cid int64) error
 	GetCollectionList(ctx context.Context, uid int64, biz string) ([]domain.Collection, error)
 	CollectionDetail(ctx context.Context, biz string, cid int64) ([]int64, error)
+	CancelLike(ctx context.Context, biz string, uid int64, aid int64) error
 }
 
 func NewIntrRepo(dao dao.InteractiveDao) InteractiveRepository {
@@ -28,6 +29,10 @@ func NewIntrRepo(dao dao.InteractiveDao) InteractiveRepository {
 
 type IntrRepo struct {
 	dao dao.InteractiveDao
+}
+
+func (repo *IntrRepo) CancelLike(ctx context.Context, biz string, uid int64, aid int64) error {
+	return repo.dao.CancelLike(ctx, biz, uid, aid)
 }
 
 func (repo *IntrRepo) CollectionDetail(ctx context.Context, biz string, cid int64) ([]int64, error) {

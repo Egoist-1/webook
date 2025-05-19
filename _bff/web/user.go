@@ -57,7 +57,7 @@ func (h *UserHandle) profile(ctx *gin.Context) {
 	u, err := h.svc.Profile(ctx, uc.Id)
 	var profile ProfileVO
 	copier.Copy(&profile, &u)
-	DecideErr(ctx, "简介", profile, err)
+	HandleErr(ctx, "简介", profile, err)
 }
 
 func (h *UserHandle) signup(ctx *gin.Context) {
@@ -109,7 +109,7 @@ func (h *UserHandle) signup(ctx *gin.Context) {
 		Email:    req.Email,
 		Password: req.Password,
 	})
-	ok = DecideErr(ctx, "注册成功", uid, err)
+	ok = HandleErr(ctx, "注册成功", uid, err)
 	if !ok {
 		return
 	}
@@ -133,7 +133,7 @@ func (h *UserHandle) login(ctx *gin.Context) {
 		return
 	}
 	uid, err := h.svc.LoginEmail(ctx, req.Email, req.Password)
-	ok := DecideErr(ctx, "登录成功", nil, err)
+	ok := HandleErr(ctx, "登录成功", nil, err)
 	if !ok {
 		return
 	}
@@ -163,7 +163,7 @@ func (h *UserHandle) edit(ctx *gin.Context) {
 	copier.Copy(&domainU, &req)
 	domainU.Id = uc.Id
 	err = h.svc.Edit(ctx, domainU)
-	DecideErr(ctx, "编辑成功", nil, err)
+	HandleErr(ctx, "编辑成功", nil, err)
 }
 
 func (h *UserHandle) sendSms(ctx *gin.Context) {
@@ -188,7 +188,7 @@ func (h *UserHandle) sendSms(ctx *gin.Context) {
 		return
 	}
 	err = h.codeSvc.SendSMS(ctx, h.biz, req.Phone)
-	DecideErr(ctx, "发送成功", nil, err)
+	HandleErr(ctx, "发送成功", nil, err)
 }
 
 func (h *UserHandle) loginSMS(ctx *gin.Context) {
@@ -215,12 +215,12 @@ func (h *UserHandle) loginSMS(ctx *gin.Context) {
 		return
 	}
 	err = h.codeSvc.Verify(ctx, h.biz, req.Phone, req.Code)
-	DecideErr(ctx, "", nil, err)
+	HandleErr(ctx, "", nil, err)
 	if err != nil {
 		return
 	}
 	uid, err := h.svc.LoginByPhone(ctx, req.Phone)
-	DecideErr(ctx, "登录成功", nil, err)
+	HandleErr(ctx, "登录成功", nil, err)
 	if err != nil {
 		return
 	}
@@ -250,5 +250,5 @@ func (h *UserHandle) sendEmail(ctx *gin.Context) {
 
 	}
 	err = h.codeSvc.SendEmail(ctx, h.biz, req.Email)
-	DecideErr(ctx, "发送成功", nil, err)
+	HandleErr(ctx, "发送成功", nil, err)
 }

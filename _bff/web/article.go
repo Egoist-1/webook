@@ -42,6 +42,8 @@ func (h *ArticleHandle) RegisterRouter(server *gin.Engine) {
 	pub.POST("/list", h.pubList)
 	pub.POST("/like", h.like)
 	pub.POST("/collected", h.collectd)
+	pub.POST("/cancelLike/:id", h.cancelLike)
+	pub.POST("/cancelCollection", h.cancelCollection)
 }
 
 func (h *ArticleHandle) edit(ctx *gin.Context) {
@@ -71,7 +73,7 @@ func (h *ArticleHandle) edit(ctx *gin.Context) {
 	}
 
 	aid, err := h.svc.Save(ctx, art)
-	DecideErr(ctx, "", aid, err)
+	HandleErr(ctx, "", aid, err)
 }
 
 func (h *ArticleHandle) publish(ctx *gin.Context) {
@@ -100,7 +102,7 @@ func (h *ArticleHandle) publish(ctx *gin.Context) {
 		},
 	}
 	aid, err := h.svc.Publish(ctx, art)
-	DecideErr(ctx, "", aid, err)
+	HandleErr(ctx, "", aid, err)
 }
 
 func (h *ArticleHandle) list(ctx *gin.Context) {
@@ -281,8 +283,8 @@ func (h *ArticleHandle) like(ctx *gin.Context) {
 		})
 		return
 	}
-	err = h.intrSvc.Liked(ctx, h.biz, int64(req.Aid), int64(claims.Id), req.Liked)
-	DecideErr(ctx, "点赞成功", nil, err)
+	err = h.intrSvc.Liked(ctx, h.biz, int64(req.Aid), int64(claims.Id))
+	HandleErr(ctx, "点赞成功", nil, err)
 }
 
 func (h *ArticleHandle) collectd(ctx *gin.Context) {
@@ -308,8 +310,8 @@ func (h *ArticleHandle) collectd(ctx *gin.Context) {
 		})
 		return
 	}
-	err = h.intrSvc.Collected(ctx, h.biz, req.Aid, claims.Id, req.Cid, req.Collected)
-	DecideErr(ctx, "收藏成功", nil, err)
+	err = h.intrSvc.Collected(ctx, h.biz, req.Aid, claims.Id, req.Cid)
+	HandleErr(ctx, "收藏成功", nil, err)
 }
 
 func (h *ArticleHandle) unpublish(ctx *gin.Context) {
@@ -320,5 +322,36 @@ func (h *ArticleHandle) unpublish(ctx *gin.Context) {
 		zap.L().Warn("articleHandle edit 参数绑定失败", zap.Error(err), zap.Any("req", ctx.Request.Body))
 	}
 	err = h.svc.Unpublish(ctx, int64(aid))
-	DecideErr(ctx, "", nil, err)
+	HandleErr(ctx, "", nil, err)
+}
+
+func (h *ArticleHandle) cancelLike(ctx *gin.Context) {
+	aid, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		return
+	}
+	claims, err := h.claims(ctx)
+	if err != nil {
+		return
+	}
+	err = h.intrSvc.CancelLike(ctx, h.biz, claims.Id, int64(aid))
+	HandleErr(ctx, "", nil, err)
+}
+
+func (h *ArticleHandle) cancelCollection(ctx *gin.Context) {
+	type Req struct {
+		ArticleId    int64
+		CollectionId int64
+	}
+	var req Req
+	err := ctx.Bind(&req)
+	if err != nil {
+		return
+	}
+	claims, err := h.claims(ctx)
+	if err != nil {
+		return
+	}
+	err = h.intrSvc.CancelCollection(ctx, h.biz, claims.Id, req.ArticleId, req.CollectionId)
+	HandleErr(ctx, "", nil, err)
 }
